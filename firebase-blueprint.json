@@ -1,0 +1,98 @@
+{
+  "entities": {
+    "Company": {
+      "title": "Company",
+      "description": "Concrete manufacturing company tenant entity",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "email"]
+    },
+    "AppUser": {
+      "title": "AppUser",
+      "description": "User profile associated with a company",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string" },
+        "companyId": { "type": "string" }
+      },
+      "required": ["uid", "email", "role", "companyId"]
+    },
+    "DispatchInvoice": {
+      "title": "DispatchInvoice",
+      "description": "Concrete dispatch delivery invoice",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "companyId": { "type": "string" },
+        "invoiceNumber": { "type": "string" },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "volumeM3": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "deliveryDate": { "type": "string" }
+      },
+      "required": ["id", "companyId", "invoiceNumber", "totalAmount"]
+    },
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "description": "Raw material stock item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "companyId": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "currentStock": { "type": "number" }
+      },
+      "required": ["id", "companyId", "name", "currentStock"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Audit trail log for company transactions and security events",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "companyId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "action": { "type": "string" },
+        "details": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "companyId", "userId", "action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/companies/{companyId}": {
+      "schema": { "$ref": "#/entities/Company" },
+      "description": "Company document"
+    },
+    "/companies/{companyId}/users/{userId}": {
+      "schema": { "$ref": "#/entities/AppUser" },
+      "description": "Users belonging to company"
+    },
+    "/companies/{companyId}/dispatches/{dispatchId}": {
+      "schema": { "$ref": "#/entities/DispatchInvoice" },
+      "description": "Concrete dispatch invoices subcollection"
+    },
+    "/companies/{companyId}/inventory/{itemId}": {
+      "schema": { "$ref": "#/entities/InventoryItem" },
+      "description": "Raw material inventory subcollection"
+    },
+    "/companies/{companyId}/audit_logs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Audit logging subcollection"
+    }
+  }
+}

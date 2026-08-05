@@ -1,0 +1,6 @@
+{
+  "name": "Concrete Factory Management - نظام إدارة مصنع الخرسانة",
+  "description": "برنامج تسيير معمل صنع وبيع الخرسانة متعدد الشركات، إدارة العمال والرواتب، الشاحنات والخلاطات، الموردين والمخزون، المبيعات للعملاء والتقارير.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
