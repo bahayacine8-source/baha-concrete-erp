@@ -31,7 +31,8 @@ import {
 } from "./services/syncEngine.js";
 
 import {
-    startAutoUpdater
+    startAutoUpdater,
+    checkForUpdatesNow
 } from "./services/updateService.js";
 
 
@@ -154,7 +155,9 @@ app.whenReady().then(async () => {
         console.log(
             "Starting application..."
         );
-
+ipcMain.handle("app:checkForUpdates", async () => {
+    return await checkForUpdatesNow();
+});
 
         // =================================================
         // IPC Controllers

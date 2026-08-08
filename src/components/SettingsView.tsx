@@ -394,7 +394,11 @@ useEffect(() => {
             <div className="space-y-2 pt-1">
               <button
                 type="button"
-                onClick={onCheckForUpdatesNow}
+                onClick={() => {
+  if (window.electronAPI?.checkForUpdates) {
+    window.electronAPI.checkForUpdates();
+  }
+}}
                 className="w-full py-2 px-3 bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 <RefreshCw className="w-3.5 h-3.5" />

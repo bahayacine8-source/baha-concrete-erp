@@ -259,4 +259,31 @@ export function startAutoUpdater() {
     }, 5000);
 
 }
+export async function checkForUpdatesNow() {
+    try {
+        console.log("Manual update check started...");
+
+        const result = await autoUpdater.checkForUpdates();
+
+        console.log(
+            "Manual update check completed:",
+            result?.updateInfo?.version
+        );
+
+        return result;
+
+    } catch (error) {
+        console.error(
+            "Manual update check failed:",
+            error
+        );
+
+        dialog.showErrorBox(
+            "خطأ في التحديث",
+            `تعذر التحقق من وجود تحديثات.\n\n${error.message}`
+        );
+
+        throw error;
+    }
+}
 
