@@ -1,13 +1,10 @@
 
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 
 import db from "./database.js";
-import { ipcMain } from "electron";
-import {
-    checkForUpdates
-} from "./updater.js";
+
 import {
     registerProductionController
 } from "./controllers/productionController.js";
@@ -16,37 +13,37 @@ import {
     runMigrations
 } from "./database/migrations.js";
 
-
 import {
     createMaterial,
     addStock
 } from "./services/materialsService.js";
-
 
 import {
     createRecipe,
     addRecipeItem
 } from "./services/recipeService.js";
 
-
 import {
     produceConcrete
 } from "./services/productionService.js";
-
 
 import {
     startSyncEngine
 } from "./services/syncEngine.js";
 
+import {
+    startAutoUpdater
+} from "./services/updateService.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-
-
+// =====================================================
 // إنشاء نافذة البرنامج
+// =====================================================
+
 function createWindow() {
 
     const win = new BrowserWindow({
@@ -68,243 +65,314 @@ function createWindow() {
     });
 
 
-const startPage = app.isPackaged
-    ? path.join(process.resourcesPath, "app.asar", "dist", "index.html")
-    : path.join(__dirname, "../dist/index.html");
+    // =================================================
+    // تحديد مكان index.html
+    // =================================================
+
+    const startPage = app.isPackaged
+        ? path.join(
+            process.resourcesPath,
+            "app.asar",
+            "dist",
+            "index.html"
+        )
+        : path.join(
+            __dirname,
+            "../dist/index.html"
+        );
 
 
-win.loadFile(startPage);
+    console.log("Loading page:", startPage);
 
 
-    console.log("Loading:", indexPath);
+    // =================================================
+    // تحميل React
+    // =================================================
 
-
-    win.loadFile(indexPath)
+    win.loadFile(startPage)
         .then(() => {
-            console.log("HTML loaded successfully");
+
+            console.log(
+                "HTML loaded successfully"
+            );
+
         })
         .catch((error) => {
-            console.error("HTML loading failed:", error);
+
+            console.error(
+                "HTML loading failed:",
+                error
+            );
+
         });
 
 
-    win.webContents.openDevTools();
+    // DevTools أثناء التطوير فقط
+    if (!app.isPackaged) {
 
+        win.webContents.openDevTools();
+
+    }
+
+
+    return win;
 }
 
 
+// =====================================================
+// تهيئة قاعدة البيانات
+// =====================================================
 
-
-// جدول إضافي بسيط
-
-function initializeDatabase(){
+function initializeDatabase() {
 
     db.exec(`
 
-    CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE IF NOT EXISTS users (
 
-        id TEXT PRIMARY KEY,
+            id TEXT PRIMARY KEY,
 
-        name TEXT,
+            name TEXT,
 
-        email TEXT
+            email TEXT
 
-    );
+        );
 
     `);
 
 }
 
 
+// =====================================================
+// تشغيل التطبيق
+// =====================================================
 
+app.whenReady().then(async () => {
 
+    try {
 
-app.whenReady().then(async()=>{
+        console.log(
+            "Starting application..."
+        );
 
-registerProductionController(ipcMain);
-    console.log("Starting application...");
 
+        // =================================================
+        // IPC Controllers
+        // =================================================
 
-    // 1 - تشغيل قاعدة البيانات
+        registerProductionController(ipcMain);
 
-    runMigrations();
 
-    initializeDatabase();
+        // =================================================
+        // 1 - قاعدة البيانات
+        // =================================================
 
+        runMigrations();
 
+        initializeDatabase();
 
-    console.log(
-        "Database ready"
-    );
+        console.log(
+            "Database ready"
+        );
 
 
+        // =================================================
+        // 2 - إنشاء المواد الخام
+        // =================================================
 
-    // 2 - إنشاء المواد الخام
+        const cement = createMaterial({
 
-    const cement = createMaterial({
+            company_id: "company_001",
 
-        company_id:"company_001",
+            name: "Cement",
 
-        name:"Cement",
+            unit: "kg",
 
-        unit:"kg",
+            minimum_quantity: 2000
 
-        minimum_quantity:2000
+        });
 
-    });
 
+        const sand = createMaterial({
 
+            company_id: "company_001",
 
-    const sand = createMaterial({
+            name: "Sand",
 
-        company_id:"company_001",
+            unit: "kg",
 
-        name:"Sand",
+            minimum_quantity: 5000
 
-        unit:"kg",
+        });
 
-        minimum_quantity:5000
 
-    });
+        // =================================================
+        // 3 - إضافة المخزون
+        // =================================================
 
+        addStock(
+            cement.id,
+            10000
+        );
 
 
-    // 3 - إضافة المخزون
+        addStock(
+            sand.id,
+            20000
+        );
 
-    addStock(
 
-        cement.id,
+        console.log(
+            "Materials created"
+        );
 
-        10000
 
-    );
+        // =================================================
+        // 4 - إنشاء وصفة الخرسانة
+        // =================================================
 
+        const recipe = createRecipe({
 
-    addStock(
+            company_id: "company_001",
 
-        sand.id,
+            name: "Standard Concrete",
 
-        20000
+            concrete_grade: "C25"
 
-    );
+        });
 
 
+        addRecipeItem({
 
-    console.log(
-        "Materials created"
-    );
+            recipe_id: recipe.id,
 
+            material_id: cement.id,
 
+            quantity: 350,
 
+            unit: "kg"
 
-    // 4 - إنشاء وصفة الخرسانة
+        });
 
-    const recipe = createRecipe({
 
-        company_id:"company_001",
+        addRecipeItem({
 
-        name:"Standard Concrete",
+            recipe_id: recipe.id,
 
-        concrete_grade:"C25"
+            material_id: sand.id,
 
-    });
+            quantity: 700,
 
+            unit: "kg"
 
+        });
 
 
+        console.log(
+            "Recipe created:",
+            recipe.id
+        );
 
-    addRecipeItem({
 
-        recipe_id:recipe.id,
+        // =================================================
+        // 5 - تجربة إنتاج 10 m3
+        // =================================================
 
-        material_id:cement.id,
+        const production = produceConcrete(
 
-        quantity:350,
+            "production001",
 
-        unit:"kg"
+            recipe.id,
 
-    });
+            10
 
+        );
 
 
-    addRecipeItem({
+        console.log(
+            "Production result:",
+            production
+        );
 
-        recipe_id:recipe.id,
 
-        material_id:sand.id,
+        // =================================================
+        // 6 - تشغيل المزامنة
+        // =================================================
 
-        quantity:700,
+        await startSyncEngine();
 
-        unit:"kg"
 
-    });
+        setInterval(async () => {
 
+            try {
 
+                await startSyncEngine();
 
-    console.log(
-        "Recipe created:",
-        recipe.id
-    );
+            } catch (error) {
 
+                console.error(
+                    "Sync error:",
+                    error
+                );
 
+            }
 
+        }, 30000);
 
 
-    // 5 - تجربة إنتاج 10 m3 خرسانة
+        // =================================================
+        // 7 - فتح النافذة
+        // =================================================
 
-    const production = produceConcrete(
+        createWindow();
 
-        "production001",
 
-        recipe.id,
+        // =================================================
+        // 8 - تشغيل التحديث التلقائي
+        // =================================================
 
-        10
+        if (app.isPackaged) {
 
-    );
+            startAutoUpdater();
 
+        } else {
 
+            console.log(
+                "Auto updater disabled in development mode."
+            );
 
-    console.log(
+        }
 
-        "Production result:",
 
-        production
+        console.log(
+            "Application started successfully."
+        );
 
-    );
 
+    } catch (error) {
 
-
-
-
-    // 6 - تشغيل المزامنة
-
-    await startSyncEngine();
-
-
-    // 7 - فتح البرنامج
-
-    createWindow();
-
-checkForUpdates();
-
-});
-
-
-
-
-
-app.on(
-
-"window-all-closed",
-
-()=>{
-
-
-    if(process.platform !== "darwin"){
-
-        app.quit();
+        console.error(
+            "Application startup failed:",
+            error
+        );
 
     }
 
-
 });
+
+
+// =====================================================
+// إغلاق التطبيق
+// =====================================================
+
+app.on(
+    "window-all-closed",
+    () => {
+
+        if (process.platform !== "darwin") {
+
+            app.quit();
+
+        }
+
+    }
+);
