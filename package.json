@@ -2,7 +2,7 @@
   "main": "electron/main.mjs",
   "name": "react-example",
   "private": true,
-  "version": "1.0.9",
+  "version": "1.0.10",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -43,38 +43,37 @@
     "wait-on": "^9.1.0"
   },
   "build": {
-    "appId": "com.baha.concretefactory",
-    "productName": "Concrete Factory Management",
-    "artifactName": "${productName}-${version}-${arch}.${ext}",
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "dist/**/*",
-      "electron/**/*",
-      "package.json"
-    ],
-    "extraResources": [
-      "firebase-applet-config.json"
-    ],
-    "publish": [
+  "appId": "com.baha.concretefactory",
+  "productName": "Concrete Factory Management",
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/**/*",
+    "package.json"
+  ],
+  "extraResources": [
+    "firebase-applet-config.json"
+  ],
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "bahayacine8-source",
+      "repo": "baha-concrete-erp",
+      "releaseType": "release"
+    }
+  ],
+  "win": {
+    "target": [
       {
-        "provider": "github",
-        "owner": "bahayacine8-source",
-        "repo": "baha-concrete-erp",
-        "releaseType": "release"
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
       }
     ],
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "icon": "build/icon.ico"
-    }
+    "icon": "build/icon.ico"
   }
+}
 }
