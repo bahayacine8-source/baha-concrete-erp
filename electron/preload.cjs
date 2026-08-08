@@ -1,8 +1,8 @@
+
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("api", {
     production: {
-
         create: (data) =>
             ipcRenderer.invoke("production:create", data),
 
@@ -15,6 +15,10 @@ contextBridge.exposeInMainWorld("api", {
                 id,
                 status
             )
-
     }
+});
+
+contextBridge.exposeInMainWorld("electronAPI", {
+    getAppVersion: () =>
+        ipcRenderer.invoke("app:getVersion")
 });

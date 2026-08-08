@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import { Company, Language } from '../types';
+import React, { useEffect, useState } from 'react';
 import { getTranslation } from '../lib/translations';
 import { 
   Settings, 
@@ -73,6 +73,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     };
     reader.readAsDataURL(file);
   };
+
+const [appVersion, setAppVersion] = useState(currentVersion || '');
+
+useEffect(() => {
+  if (window.electronAPI?.getAppVersion) {
+    window.electronAPI.getAppVersion().then((version: string) => {
+      setAppVersion(`v${version}`);
+    });
+  }
+}, [currentVersion]);
 
   const handleSaveCompany = (e: React.FormEvent) => {
     e.preventDefault();
@@ -341,7 +351,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <h3 className="font-bold text-slate-900 text-sm">التحديثات الآلية عبر GitHub</h3>
               </div>
               <span className="px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 font-mono text-[10px] font-bold">
-                {currentVersion || 'v3.5.0'}
+                {appVersion || 'جارٍ التحميل...'}
               </span>
             </div>
 

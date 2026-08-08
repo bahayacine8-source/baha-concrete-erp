@@ -4,7 +4,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { Menu } from "electron";
 import db from "./database.js";
-
 import {
     registerProductionController
 } from "./controllers/productionController.js";
@@ -140,7 +139,9 @@ function initializeDatabase() {
     `);
 
 }
-
+ipcMain.handle("app:getVersion", () => {
+    return app.getVersion();
+});
 
 // =====================================================
 // تشغيل التطبيق
