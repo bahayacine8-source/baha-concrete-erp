@@ -1,6 +1,10 @@
 
-import { autoUpdater } from "electron-updater";
 import { dialog } from "electron";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+
+const { autoUpdater } = require("electron-updater");
 
 
 // =====================================================
@@ -18,12 +22,25 @@ autoUpdater.autoInstallOnAppQuit = true;
 export function startAutoUpdater() {
 
     console.log(
+        "================================="
+    );
+
+    console.log(
         "Auto updater started."
+    );
+
+    console.log(
+        "Current version:",
+        autoUpdater.currentVersion.version
+    );
+
+    console.log(
+        "================================="
     );
 
 
     // =================================================
-    // البحث عن تحديث
+    // فحص التحديث
     // =================================================
 
     autoUpdater.on(
@@ -48,7 +65,7 @@ export function startAutoUpdater() {
 
             console.log(
                 "Application is up to date:",
-                info.version
+                info?.version
             );
 
         }
@@ -64,8 +81,16 @@ export function startAutoUpdater() {
         (info) => {
 
             console.log(
-                "Update available:",
+                "================================="
+            );
+
+            console.log(
+                "UPDATE AVAILABLE:",
                 info.version
+            );
+
+            console.log(
+                "================================="
             );
 
 
@@ -133,7 +158,15 @@ export function startAutoUpdater() {
         () => {
 
             console.log(
-                "Update downloaded successfully."
+                "================================="
+            );
+
+            console.log(
+                "UPDATE DOWNLOADED"
+            );
+
+            console.log(
+                "================================="
             );
 
 
@@ -147,7 +180,7 @@ export function startAutoUpdater() {
                     "تم تحميل التحديث بنجاح.",
 
                 detail:
-                    "اضغط إعادة التشغيل الآن لتثبيت التحديث.",
+                    "هل تريد إعادة تشغيل البرنامج وتثبيت التحديث؟",
 
                 buttons: [
                     "إعادة التشغيل الآن",
@@ -181,8 +214,19 @@ export function startAutoUpdater() {
         (error) => {
 
             console.error(
-                "Auto updater error:",
+                "================================="
+            );
+
+            console.error(
+                "AUTO UPDATE ERROR"
+            );
+
+            console.error(
                 error
+            );
+
+            console.error(
+                "================================="
             );
 
         }
@@ -190,16 +234,27 @@ export function startAutoUpdater() {
 
 
     // =================================================
-    // بدء الفحص
+    // بدء الفحص بعد تشغيل التطبيق
     // =================================================
 
-    setTimeout(() => {
+    setTimeout(async () => {
 
-        console.log(
-            "Starting update check..."
-        );
+        try {
 
-        autoUpdater.checkForUpdates();
+            console.log(
+                "Starting update check..."
+            );
+
+            await autoUpdater.checkForUpdates();
+
+        } catch (error) {
+
+            console.error(
+                "Update check failed:",
+                error
+            );
+
+        }
 
     }, 5000);
 
