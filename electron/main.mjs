@@ -2,7 +2,7 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
-
+import { Menu } from "electron";
 import db from "./database.js";
 
 import {
@@ -322,7 +322,7 @@ app.whenReady().then(async () => {
         // =================================================
         // 7 - فتح النافذة
         // =================================================
-
+Menu.setApplicationMenu(null);
         createWindow();
 
 
