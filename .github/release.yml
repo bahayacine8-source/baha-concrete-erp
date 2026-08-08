@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Rebuild native modules
+        run: npx electron-rebuild
+
       - name: Build and publish
         run: npm run build:app -- --publish always
         env:

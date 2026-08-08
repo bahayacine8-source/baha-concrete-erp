@@ -29,6 +29,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@electron/rebuild": "^4.2.0",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
@@ -42,43 +43,38 @@
     "vite": "^6.2.3",
     "wait-on": "^9.1.0"
   },
- "build": {
-  "appId": "com.baha.concretefactory",
-  "productName": "Concrete Factory Management",
-
-  "directories": {
-    "output": "release"
-  },
-
-  "files": [
-    "dist/**/*",
-    "electron/**/*",
-    "package.json"
-  ],
-
-  "extraResources": [
-    "firebase-applet-config.json"
-  ],
-
-  "publish": [
-    {
-      "provider": "github",
-      "owner": "bahayacine8-source",
-      "repo": "baha-concrete-erp",
-      "releaseType": "release"
-    }
-  ],
-
-  "win": {
-    "target": [
+  "build": {
+    "appId": "com.baha.concretefactory",
+    "productName": "Concrete Factory Management",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      "firebase-applet-config.json"
+    ],
+    "publish": [
       {
-        "target": "nsis",
-        "arch": [
-          "x64"
-        ]
+        "provider": "github",
+        "owner": "bahayacine8-source",
+        "repo": "baha-concrete-erp",
+        "releaseType": "release"
       }
     ],
-    "icon": "build/icon.ico"
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    }
   }
-}
 }
