@@ -2,7 +2,7 @@
   "main": "electron/main.mjs",
   "name": "react-example",
   "private": true,
-  "version": "1.0.10",
+  "version": "1.0.11",
   "type": "module",
   "scripts": {
     "dev": "vite",
