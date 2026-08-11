@@ -1,3 +1,4 @@
+
 name: Release
 
 on:
@@ -13,7 +14,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -33,3 +33,4 @@ jobs:
         run: npm run build:app -- --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+Set-Content -Path ".github\workflows\release.yml" -Encoding utf8
